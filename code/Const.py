@@ -1,0 +1,15 @@
+WIN_WIDTH = 1024
+
+WIN_HEIGHT = 576
+
+FPS = 60
+
+WHITE = (255, 255, 255)
+
+BLACK = (0, 0, 0)
+
+ORANGE = (255, 140, 0)
+
+YELLOW = (255, 255, 0)
+
+RED = (255, 0, 0)
