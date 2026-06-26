@@ -1,22 +1,16 @@
 import pygame
 
-from code.Menu import Menu
+from code.Game import Game
+
 
 pygame.init()
 
-window = pygame.display.set_mode(
+window = pygame.display.set_mode((1024,576))
 
-    (1024, 576)
+pygame.display.set_caption("Estagiário em Pânico")
 
-)
+game = Game(window)
 
-pygame.display.set_caption(
+game.run()
 
-    "O Estagiário"
-
-)
-
-menu = Menu(window)
-
-option = menu.run()
-print(option)
+pygame.quit()
