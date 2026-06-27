@@ -7,49 +7,229 @@ class Player:
 
     def __init__(self):
 
-        self.width = 32
-        self.height = 32
+        # -------------------------
+        # Posição inicial
+        # -------------------------
 
-        self.x = 100
-        self.y = 300
+        self.x = 90
+        self.y = 220
 
-        self.speed = PLAYER_SPEED
+        self.speed = 4
+
+        self.width = 40
+        self.height = 55
+
+        # -------------------------
+        # Sistema de itens
+        # -------------------------
 
         self.carrying_item = False
         self.current_item = None
+
+        # -------------------------
+        # Direção
+        # -------------------------
+
+        self.direction = "frente"
+
+        # -------------------------
+        # Animação
+        # -------------------------
+
+        self.frame = 0
+        self.animation_speed = 0.18
+        self.moving = False
+
+        # -------------------------
+        # Carrega sprites
+        # -------------------------
+
+        self.sprites = {
+
+            "frente": [
+
+                pygame.image.load(
+                    "assets/sprites/frente_0.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/frente_1.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/frente_2.png"
+                ).convert_alpha()
+
+            ],
+
+            "costas": [
+
+                pygame.image.load(
+                    "assets/sprites/costas_0.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/costas_1.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/costas_2.png"
+                ).convert_alpha()
+
+            ],
+
+            "esquerda": [
+
+                pygame.image.load(
+                    "assets/sprites/esquerda_0.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/esquerda_1.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/esquerda_2.png"
+                ).convert_alpha()
+
+            ],
+
+            "direita": [
+
+                pygame.image.load(
+                    "assets/sprites/direita_0.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/direita_1.png"
+                ).convert_alpha(),
+
+                pygame.image.load(
+                    "assets/sprites/direita_2.png"
+                ).convert_alpha()
+
+            ]
+
+        }
+
+        # -------------------------
+        # Redimensiona
+        # -------------------------
+
+        self.scale = 60
+
+        for direction in self.sprites:
+
+            for i in range(len(self.sprites[direction])):
+
+                self.sprites[direction][i] = pygame.transform.scale(
+
+                    self.sprites[direction][i],
+
+                    (self.scale, self.scale * 2)
+
+                )
+
+    # =======================================
 
     def move(self):
 
         keys = pygame.key.get_pressed()
 
+        self.moving = False
+
         if keys[pygame.K_w]:
+
             self.y -= self.speed
 
-        if keys[pygame.K_s]:
+            self.direction = "costas"
+
+            self.moving = True
+
+        elif keys[pygame.K_s]:
+
             self.y += self.speed
 
-        if keys[pygame.K_a]:
+            self.direction = "frente"
+
+            self.moving = True
+
+        elif keys[pygame.K_a]:
+
             self.x -= self.speed
 
-        if keys[pygame.K_d]:
+            self.direction = "esquerda"
+
+            self.moving = True
+
+        elif keys[pygame.K_d]:
+
             self.x += self.speed
 
-        if self.x < 0:
-            self.x = 0
+            self.direction = "direita"
 
-        if self.x > WIN_WIDTH - self.width:
-            self.x = WIN_WIDTH - self.width
+            self.moving = True
 
-        if self.y < 0:
-            self.y = 0
+        if self.moving:
 
-        if self.y > WIN_HEIGHT - self.height:
-            self.y = WIN_HEIGHT - self.height
+            self.frame += self.animation_speed
+
+            if self.frame >= 3:
+
+                self.frame = 0
+
+        else:
+
+            self.frame = 0
+
+    # =======================================
 
     def draw(self, window):
 
-        pygame.draw.rect(
-            window,
-            BLUE,
-            (self.x, self.y, self.width, self.height)
+        sprite = self.sprites[self.direction][int(self.frame)]
+
+        window.blit(
+
+            sprite,
+
+            (
+
+                self.x - 10,
+
+                self.y - 45
+
+            )
+
         )
+
+    # =======================================
+
+    def get_rect(self):
+
+        return pygame.Rect(
+
+            self.x,
+
+            self.y,
+
+            self.width,
+
+            self.height
+
+        )
+
+    # =======================================
+
+    def pick_item(self, item):
+
+        self.carrying_item = True
+
+        self.current_item = item.name
+
+    # =======================================
+
+    def drop_item(self):
+
+        self.carrying_item = False
+
+        self.current_item = None

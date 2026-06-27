@@ -5,7 +5,8 @@ class Request:
 
     def __init__(self):
 
-        self.all_items = [
+        # Todos os itens possíveis
+        self.available_items = [
             "cafe",
             "caneta",
             "documentos",
@@ -14,23 +15,49 @@ class Request:
             "pasta"
         ]
 
+        # Itens que ainda precisam ser pedidos
+        self.remaining_items = self.available_items.copy()
+
+        # Pedido atual
+        self.current_request = None
+
+        # Quantidade de pedidos concluídos
         self.completed = 0
 
-        self.current_request = ""
+        # Escolhe o primeiro pedido
+        self.next_request()
 
-        self.new_request()
+    def next_request(self):
+        """
+        Escolhe um novo pedido aleatório.
+        Cada item será pedido apenas uma vez por partida.
+        """
 
-    def new_request(self):
-        self.current_request = random.choice(self.all_items)
+        if len(self.remaining_items) == 0:
+            self.current_request = None
+            return
 
-    def check(self, item_name):
+        self.current_request = random.choice(self.remaining_items)
+        self.remaining_items.remove(self.current_request)
+
+    def check_delivery(self, item_name):
+        """
+        Verifica se o item entregue é o correto.
+        """
 
         if item_name == self.current_request:
 
             self.completed += 1
 
-            self.new_request()
+            self.next_request()
 
             return True
 
         return False
+
+    def game_finished(self):
+        """
+        Retorna True quando todos os pedidos foram concluídos.
+        """
+
+        return self.completed >= 6

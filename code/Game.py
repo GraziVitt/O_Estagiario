@@ -16,28 +16,20 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.player = Player()
+
         self.boss = Boss()
+
         self.request = Request()
 
-        self.items = [
+        self.total_time = 40
 
-            Item("cafe"),
-
-            Item("caneta"),
-
-            Item("documentos"),
-
-            Item("copo"),
-
-            Item("grampeador"),
-
-            Item("pasta")
-
-        ]
-
-        self.delivered_items = 0
+        self.time_penalty = 3
 
         self.start_time = pygame.time.get_ticks()
+
+        self.font = pygame.font.SysFont("Arial", 28)
+
+        self.big_font = pygame.font.SysFont("Arial", 42)
 
         self.background = pygame.image.load(
             "assets/background/escritorio.png"
@@ -48,7 +40,169 @@ class Game:
             (WIN_WIDTH, WIN_HEIGHT)
         )
 
-        self.font = pygame.font.SysFont(None, 36)
+        self.items = [
+
+            Item(
+                "cafe",
+                "assets/itens/cafe.png",
+                (340,210)
+            ),
+
+            Item(
+                "caneta",
+                "assets/itens/caneta.png",
+                (45,205)
+            ),
+
+            Item(
+                "documentos",
+                "assets/itens/documentos.png",
+                (470,205)
+            ),
+
+            Item(
+                "copo",
+                "assets/itens/copo.png",
+                (595,75)
+            ),
+
+            Item(
+                "grampeador",
+                "assets/itens/grampeador.png",
+                (65,70)
+            ),
+
+            Item(
+                "pasta",
+                "assets/itens/pasta.png",
+                (130,445)
+            )
+
+        ]
+
+    # ----------------------------------------------------
+
+    def remaining_time(self):
+
+        elapsed = (
+
+            pygame.time.get_ticks()
+
+            - self.start_time
+
+        ) // 1000
+
+        return self.total_time - elapsed
+
+    # ----------------------------------------------------
+
+    def reset_item(self, item_name):
+
+        for item in self.items:
+
+            if item.name == item_name:
+
+                item.reset()
+
+                break
+
+    # ----------------------------------------------------
+
+    def draw_hud(self):
+
+        time_left = self.remaining_time()
+
+        color = WHITE
+
+        if time_left <= 15:
+
+            color = YELLOW
+
+        if time_left <= 5:
+
+            color = RED
+
+        timer = self.font.render(
+
+            f"Tempo: {time_left}",
+
+            True,
+
+            color
+
+        )
+
+        self.window.blit(timer, (20,20))
+
+        pedidos = self.font.render(
+
+            f"Pedidos: {self.request.completed}/6",
+
+            True,
+
+            WHITE
+
+        )
+
+        self.window.blit(
+
+            pedidos,
+
+            (20,60)
+
+        )
+
+        if self.player.carrying_item:
+
+            carregando = self.font.render(
+
+                f"Item: {self.player.current_item}",
+
+                True,
+
+                YELLOW
+
+            )
+
+            self.window.blit(
+
+                carregando,
+
+                (20,100)
+
+            )
+
+    # ----------------------------------------------------
+
+    def draw(self):
+
+        self.window.blit(
+
+            self.background,
+
+            (0,0)
+
+        )
+
+        for item in self.items:
+
+            item.draw(self.window)
+
+        self.player.draw(self.window)
+
+        self.boss.draw(
+
+            self.window,
+
+            self.request
+
+        )
+
+        self.draw_hud()
+
+        pygame.display.flip()
+
+    # ----------------------------------------------------
 
     def run(self):
 
@@ -58,131 +212,96 @@ class Game:
 
             self.clock.tick(FPS)
 
-            elapsed = (
-                              pygame.time.get_ticks()
-                              - self.start_time
-                      ) // 1000
+            self.player.move()
 
-            time_left = 40 - elapsed
+            self.boss.update()
 
-            # DERROTA
+            time_left = self.remaining_time()
+
             if time_left <= 0:
-                print("DERROTA!")
 
-                running = False
+                return "LOSE"
 
-            # VITÓRIA
-            if self.delivered_items >= 6:
-                print("VITORIA!")
+            if self.request.game_finished():
 
-                running = False
+                return "WIN"
+
+            # -----------------------------------------
+            # Eventos (entrada do jogador)
+            # -----------------------------------------
 
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
-                    running = False
+
+                    pygame.quit()
+
+                    quit()
 
                 if event.type == pygame.KEYDOWN:
 
                     if event.key == pygame.K_SPACE:
 
-                        player_rect = pygame.Rect(
-                            self.player.x,
-                            self.player.y,
-                            self.player.width,
-                            self.player.height
-                        )
+                        player_rect = self.player.get_rect()
 
+                        # ===============================
                         # PEGAR ITEM
+                        # ===============================
+
                         if not self.player.carrying_item:
 
                             for item in self.items:
 
-                                if not item.collected:
+                                if item.collected:
+                                    continue
 
-                                    if player_rect.colliderect(
-                                            item.get_rect()):
-                                        item.collected = True
+                                if player_rect.colliderect(item.get_rect()):
+                                    item.collected = True
 
-                                        self.player.carrying_item = True
+                                    self.player.pick_item(item)
 
-                                        self.player.current_item = item.nome
+                                    break
 
-                                        print("Pegou:", item.nome)
-
-                                        break
-
+                        # ===============================
                         # ENTREGAR ITEM
+                        # ===============================
+
                         else:
 
                             if player_rect.colliderect(
-                                    self.boss.get_rect()):
-                                print("Entregou:", self.player.current_item)
+                                    self.boss.get_rect()
+                            ):
 
-                                self.player.carrying_item = False
+                                # ITEM CERTO
+                                if self.request.check_delivery(
+                                        self.player.current_item
+                                ):
 
-                                self.player.current_item = None
+                                    self.boss.show_message(
+                                        "Boa!"
+                                    )
 
-                                self.delivered_items += 1
+                                # ITEM ERRADO
+                                else:
 
-                                print(
-                                    "ITEM ENTREGUE:",
-                                    self.delivered_items
-                                )
+                                    self.boss.show_message(
+                                        "Eu nao pedi isso!"
+                                    )
 
-            self.player.move()
+                                    self.start_time -= (
+                                            self.time_penalty * 1000
+                                    )
 
-            self.window.blit(
-                self.background,
-                (0, 0)
-            )
+                                    self.reset_item(
+                                        self.player.current_item
+                                    )
 
-            self.player.draw(
-                self.window
-            )
+                                self.player.drop_item()
 
-            self.boss.draw(
-                self.window,
-                self.request
-            )
+            # -----------------------------------------
+            # Desenha a cada frame (fora do loop de eventos!)
+            # -----------------------------------------
 
-            for item in self.items:
-                item.draw(
-                    self.window
-                )
+            self.draw()
 
-            timer_text = self.font.render(
-                f"Tempo: {time_left}",
-                True,
-                WHITE
-            )
-
-            self.window.blit(
-                timer_text,
-                (20, 20)
-            )
-
-            delivery_text = self.font.render(
-                f"Entregues: {self.delivered_items}/6",
-                True,
-                WHITE
-            )
-
-            self.window.blit(
-                delivery_text,
-                (20, 60)
-            )
-
-            if self.player.carrying_item:
-                carry_text = self.font.render(
-                    "CARREGANDO ITEM",
-                    True,
-                    YELLOW
-                )
-
-                self.window.blit(
-                    carry_text,
-                    (20, 100)
-                )
-
-            pygame.display.flip()
+        return "LOSE"

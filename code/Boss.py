@@ -1,68 +1,74 @@
 import pygame
 
+from code.Const import *
 
 class Boss:
 
     def __init__(self):
-        self.width = 60
-        self.height = 80
 
-        # Posição do chefe
-        self.x = 620
-        self.y = 240
+        self.x = 730
+        self.y = 120
 
-        # Cor temporária (depois será substituída pelo sprite)
-        self.color = (180, 50, 50)
+        self.width = 64
+        self.height = 64
 
-        self.font = pygame.font.SysFont(None, 28)
+        sprite_sheet = pygame.image.load(
+            "assets/sprites/chefe.png"
+        ).convert_alpha()
+
+        # usa o chefe do meio (expressão neutra)
+        self.image = sprite_sheet.subsurface(
+            (64, 0, 64, 64)
+        )
+
+        self.message = ""
+        self.message_timer = 0
+
+        self.font = pygame.font.SysFont("Arial", 24)
 
     def draw(self, window, request):
-        # Desenha o chefe
-        pygame.draw.rect(
-            window,
-            self.color,
-            (self.x, self.y, self.width, self.height)
+
+        window.blit(
+            self.image,
+            (self.x, self.y)
         )
 
-        # Balão
-        balloon = pygame.Rect(
-            self.x - 60,
-            self.y - 75,
-            180,
-            50
-        )
-
-        pygame.draw.rect(
-            window,
-            (255, 255, 255),
-            balloon,
-            border_radius=8
-        )
-
-        pygame.draw.rect(
-            window,
-            (0, 0, 0),
-            balloon,
-            2,
-            border_radius=8
-        )
-
-        # Texto
-        text = self.font.render(
-            f"Quero: {request.current_request}",
+        pedido = self.font.render(
+            request.current_request.upper(),
             True,
-            (0, 0, 0)
+            WHITE
         )
 
         window.blit(
-            text,
-            (
-                balloon.x + 10,
-                balloon.y + 15
-            )
+            pedido,
+            (620, 80)
         )
 
+        if self.message_timer > 0:
+
+            texto = self.font.render(
+                self.message,
+                True,
+                YELLOW
+            )
+
+            window.blit(
+                texto,
+                (620, 50)
+            )
+
+    def update(self):
+
+        if self.message_timer > 0:
+            self.message_timer -= 1
+
+    def show_message(self, message):
+
+        self.message = message
+        self.message_timer = 90
+
     def get_rect(self):
+
         return pygame.Rect(
             self.x,
             self.y,
