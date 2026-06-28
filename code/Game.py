@@ -1,10 +1,13 @@
 import pygame
 
+
 from code.Const import *
 from code.Player import Player
 from code.Boss import Boss
 from code.Item import Item
 from code.Request import Request
+from code.Collision import COLLIDERS
+
 
 
 class Game:
@@ -200,6 +203,18 @@ class Game:
 
         self.draw_hud()
 
+        # ==========================================
+        # MOSTRAR COLISÕES
+        # ==========================================
+
+        for collider in COLLIDERS:
+            pygame.draw.rect(
+                self.window,
+                (255, 0, 0),
+                collider,
+                2
+            )
+
         pygame.display.flip()
 
     # ----------------------------------------------------
@@ -213,6 +228,15 @@ class Game:
             self.clock.tick(FPS)
 
             self.player.move()
+
+            player_rect = self.player.get_rect()
+
+            for wall in COLLIDERS:
+
+                if player_rect.colliderect(wall):
+                    self.player.undo_move()
+
+                    break
 
             self.boss.update()
 

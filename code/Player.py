@@ -14,6 +14,9 @@ class Player:
         self.x = 90
         self.y = 220
 
+        self.old_x = self.x
+        self.old_y = self.y
+
         self.speed = 4
 
         self.width = 40
@@ -134,6 +137,9 @@ class Player:
 
     def move(self):
 
+        self.old_x = self.x
+        self.old_y = self.y
+
         keys = pygame.key.get_pressed()
 
         self.moving = False
@@ -233,3 +239,8 @@ class Player:
         self.carrying_item = False
 
         self.current_item = None
+
+    def undo_move(self):
+
+        self.x = self.old_x
+        self.y = self.old_y

@@ -59,6 +59,14 @@ class Victory:
             self.draw_button(self.retry_rect, "Jogar de novo", mouse)
             self.draw_button(self.menu_rect, "Voltar ao Menu", mouse)
 
+            for collider in COLLIDERS:
+                pygame.draw.rect(
+                    self.window,
+                    (255, 0, 0),
+                    collider,
+                    2
+                )
+
             pygame.display.flip()
 
             for event in pygame.event.get():
