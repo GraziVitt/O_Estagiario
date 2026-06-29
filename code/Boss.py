@@ -5,7 +5,7 @@ class Boss:
 
     def __init__(self):
 
-        self.x = 734
+        self.x = 739
         self.y = 77
 
         self.width = 55
@@ -27,29 +27,39 @@ class Boss:
             "assets/boss/chefe_bravo.png"
         ).convert_alpha()
 
-        # tamanho
+        # ----------------------------
+        # Tamanho
+        # ----------------------------
+
         self.normal = pygame.transform.scale(
             self.normal,
-            (60,120)
+            (50, 110)
         )
 
         self.happy = pygame.transform.scale(
             self.happy,
-            (60,120)
+            (50, 110)
         )
 
         self.angry = pygame.transform.scale(
             self.angry,
-            (60,120)
+            (50, 110)
         )
 
         self.current_sprite = self.normal
 
-        # mensagem
+        # ----------------------------
+        # Mensagem
+        # ----------------------------
+
         self.message = ""
         self.message_timer = 0
 
-        self.font = pygame.font.SysFont("Arial",24,True)
+        self.font = pygame.font.SysFont(
+            "Arial",
+            24,
+            True
+        )
 
     # ----------------------------------
 
@@ -61,7 +71,6 @@ class Boss:
 
         if text == "Boa!":
             self.current_sprite = self.happy
-
         else:
             self.current_sprite = self.angry
 
@@ -78,8 +87,10 @@ class Boss:
                 self.current_sprite = self.normal
 
     # ----------------------------------
+    # DESENHA APENAS O SPRITE
+    # ----------------------------------
 
-    def draw(self, window, request):
+    def draw_sprite(self, window):
 
         window.blit(
 
@@ -89,13 +100,19 @@ class Boss:
 
         )
 
+    # ----------------------------------
+    # DESENHA APENAS TEXTOS
+    # ----------------------------------
+
+    def draw(self, window, request):
+
         pedido = self.font.render(
 
             request.current_request,
 
             True,
 
-            (255,255,255)
+            (255, 255, 255)
 
         )
 
@@ -103,7 +120,7 @@ class Boss:
 
             pedido,
 
-            (self.x-10, self.y-30)
+            (self.x - 10, self.y - 30)
 
         )
 
@@ -115,7 +132,7 @@ class Boss:
 
                 True,
 
-                (255,255,0)
+                (255, 255, 0)
 
             )
 
@@ -123,7 +140,7 @@ class Boss:
 
                 texto,
 
-                (self.x-30, self.y-60)
+                (self.x - 30, self.y - 60)
 
             )
 
@@ -132,8 +149,13 @@ class Boss:
     def get_rect(self):
 
         return pygame.Rect(
+
             self.x - 40,
+
             self.y + 40,
+
             150,
+
             140
+
         )

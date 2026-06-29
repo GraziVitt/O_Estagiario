@@ -14,7 +14,7 @@ class Scenery:
                 "assets/furniture/mesa_estagiario.png",
                 0, 140,
                 size=(260, 212),
-                collision_margin=(-80, 60, 60, 55)  # + esquerda, + topo, + direita, + baixo
+                collision_margin=(-80, 60, 60, 55)
             ),
 
             # -------------------------------------------------
@@ -24,7 +24,7 @@ class Scenery:
                 "assets/furniture/mesa_estagiario.png",
                 0, 140,
                 size=(260, 212),
-                collision_margin=(210, 110, 10, 55)  # + esquerda, + topo, + direita, + baixo
+                collision_margin=(210, 110, 10, 55)
             ),
 
             # -------------------------------------------------
@@ -52,22 +52,22 @@ class Scenery:
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_chefe.png",
-                695, 60,
-                size=(160, 295),
+                710, 70,
+                size=(130, 230),
                 collision_margin=(5, 140, -3, 50)
-
             ),
 
             # -------------------------------------------------
-            # Mesa do chefe cadeira
+            # Tampo da mesa do chefe
+            # always_front removido — agora entra no depth sort
+            # junto com jogador e chefe, cobrindo o chefe mas
+            # ficando atrás do jogador quando ele está acima na tela.
             # -------------------------------------------------
             Furniture(
-                "assets/furniture/mesa_chefe.png",
-                700, 60,
-                size=(160, 295),
-                collision_margin=(20, 8, -3, 170)
-
-
+                "assets/furniture/tampo_mesa.png",
+                710, 70,
+                size=(130, 230),
+                collision_margin=(20, 8, -3, 50),
             ),
 
             # -------------------------------------------------
@@ -103,7 +103,6 @@ class Scenery:
             # -------------------------------------------------
             # Plantas
             # -------------------------------------------------
-
             Furniture(
                 "assets/furniture/planta.png",
                 565, 452,

@@ -5,7 +5,7 @@ from code.Player import Player
 from code.Boss import Boss
 from code.Item import Item
 from code.Request import Request
-from code.Collision import COLLIDERS, WALLS, FURNITURE  # <-- IMPORTEI FURNITURE
+from code.Collision import COLLIDERS, WALLS, FURNITURE
 from code.Scenery import Scenery
 
 
@@ -130,56 +130,54 @@ class Game:
         # 1. Fundo
         self.window.blit(self.background, (0, 0))
 
-        # ==========================================
-        # 2. Móveis normais (sem always_front) + jogador
-        # ==========================================
-        objetos_para_desenhar = []
+        # ------------------------------------------------------------------
+        # Depth sort unificado — todos os elementos competem pelo mesmo Y.
+        # mesa_chefe, chefe e tampo_mesa recebem Y fixos que garantem a
+        # ordem correta entre si, mas o jogador pode ultrapassá-los quando
+        # seu Y real for maior (mais abaixo na tela).
+        #
+        # Y fixos escolhidos:
+        #   mesa_chefe  → 250  (base da mesa, atrás do chefe)
+        #   chefe       → 260  (na frente da mesa, atrás do tampo)
+        #   tampo_mesa  → 270  (frente da mesa, cobre o chefe)
+        #
+        # O jogador entra com seu Y real. Quando estiver acima da mesa
+        # (Y < 270) fica atrás do tampo; quando estiver abaixo (Y > 270)
+        # fica na frente — efeito correto de profundidade.
+        # ------------------------------------------------------------------
 
-        # Adiciona móveis que NÃO são always_front
-        for mob in self.scenery.furniture:
-            if not mob.always_front:
-                objetos_para_desenhar.append(mob)
+        MESA_Y  = 250
+        CHEFE_Y = 260
+        TAMPO_Y = 270
 
-        # Adiciona o jogador
-        objetos_para_desenhar.append(self.player)
+        entities = []
 
-        # Ordena pelo Y (profundidade)
-        def get_bottom(obj):
-            if hasattr(obj, 'get_rect'):
-                return obj.get_rect().bottom
+        for piece in self.scenery.furniture:
+            if "mesa_chefe.png" in piece.image_path:
+                entities.append((MESA_Y, piece.draw))
+            elif "tampo_mesa" in piece.image_path:
+                entities.append((TAMPO_Y, piece.draw))
             else:
-                return obj.rect.bottom
+                entities.append((piece.sort_key(), piece.draw))
 
-        objetos_para_desenhar.sort(key=get_bottom)
+        # Jogador com Y real
+        player_y = self.player.y + self.player.height
+        entities.append((player_y, self.player.draw))
 
-        # Desenha tudo (jogador + móveis normais), respeitando a profundidade
-        for obj in objetos_para_desenhar:
-            obj.draw(self.window)
+        # Chefe com Y fixo
+        entities.append((CHEFE_Y, self.boss.draw_sprite))
 
-        # ==========================================
-        # 3. Itens — SEMPRE por cima dos móveis e do jogador
-        # ==========================================
-        # Os itens são objetos de coleta, não fazem parte da
-        # ordenação por profundidade: ficam sempre visíveis,
-        # mesmo quando estão em cima de um móvel.
+        entities.sort(key=lambda e: e[0])
+        for _, draw_fn in entities:
+            draw_fn(self.window)
+
+        # Itens sempre visíveis (acima de tudo)
         for item in self.items:
-            item.draw(self.window)
+            if not item.collected:
+                item.draw(self.window)
 
-        # ==========================================
-        # 4. Chefe (desenha antes da mesa, se quiser que fique atrás)
-        # ==========================================
+        # Balão + HUD
         self.boss.draw(self.window, self.request)
-
-        # ==========================================
-        # 5. Móvel com always_front (mesa do chefe) - DESENHADO POR ÚLTIMO
-        # ==========================================
-        for mob in self.scenery.furniture:
-            if mob.always_front:
-                mob.draw(self.window)
-
-        # ==========================================
-        # 6. HUD (sempre por cima de tudo)
-        # ==========================================
         self.draw_hud()
 
         pygame.display.flip()
@@ -209,9 +207,7 @@ class Game:
                     player_rect = self.player.get_rect()
                     break
 
-            # ==========================================
-            # Colisão com os móveis extras (FURNITURE)  <-- NOVO
-            # ==========================================
+            # Colisão com os móveis extras (FURNITURE da Collision.py)
             for furn in FURNITURE:
                 if player_rect.colliderect(furn):
                     self.player.undo_move()
@@ -233,9 +229,6 @@ class Game:
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 
-                    # Rect maior, só para pegar/entregar item — não afeta
-                    # a colisão de movimento (paredes/móveis continuam
-                    # usando o player_rect "justo" de sempre)
                     interaction_rect = self.player.get_interaction_rect()
 
                     if not self.player.carrying_item:
