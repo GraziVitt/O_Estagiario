@@ -2,44 +2,39 @@ from code.Furniture import Furniture
 
 
 class Scenery:
-    """
-    Camada 1 do cenário (agrupada): centraliza a criação e o
-    desenho de todos os móveis do escritório.
-
-    O Game não precisa saber nomes de arquivo nem posições de
-    móvel — ele só chama scenery.draw(window).
-
-    Os PNGs de mobília foram exportados em resolução muito maior
-    que a cena (de 3x a 6x). Por isso cada Furniture aqui usa o
-    parâmetro 'size' para redimensionar a imagem, mantendo a
-    proporção (altura/largura) original de cada arquivo.
-
-    IMPORTANTE: x, y e size são um ponto de partida calculado a
-    partir da imagem de referência do escritório completo. Ajuste
-    olhando o jogo rodando, do mesmo jeito que você já fez com os
-    retângulos do Collision.py.
-    """
 
     def __init__(self):
 
         self.furniture = [
 
             # -------------------------------------------------
-            # Mesa do estagiário (papéis + monitor + cadeira + planta)
+            # Mesa do estagiário - ajuste personalizado
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_estagiario.png",
                 0, 140,
-                size=(260, 212)
+                size=(260, 212),
+                collision_margin=(-80, 60, 60, 48)  # + esquerda, + topo, + direita, + baixo
             ),
 
             # -------------------------------------------------
-            # Estação de café
+            # Mesa do estagiário - Planta
+            # -------------------------------------------------
+            Furniture(
+                "assets/furniture/mesa_estagiario.png",
+                0, 140,
+                size=(260, 212),
+                collision_margin=(210, 110, 10, 55)  # + esquerda, + topo, + direita, + baixo
+            ),
+
+            # -------------------------------------------------
+            # Cafeteira
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/cafeteira.png",
                 300, 130,
-                size=(140, 176)
+                size=(140, 176),
+                collision_margin=(8, 65, 8, 55)
             ),
 
             # -------------------------------------------------
@@ -47,60 +42,76 @@ class Scenery:
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/impressora.png",
-                445, 154,
-                size=(90, 150)
+                445, 135,
+                size=(85, 170),
+                collision_margin=(5, 65, 5, 52)
             ),
 
             # -------------------------------------------------
-            # Mesa do chefe (cadeira + laptop + papéis)
+            # Mesa do chefe
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_chefe.png",
-                690, 74,
-                size=(165, 270)
+                730, 60,
+                size=(170, 312),
+                collision_margin=(5, 140, -3, 50)
+
             ),
 
             # -------------------------------------------------
-            # Mesas dos funcionários (fileira com 4 estações)
+            # Mesa do chefe cadeira
+            # -------------------------------------------------
+            Furniture(
+                "assets/furniture/mesa_chefe.png",
+                730, 60,
+                size=(170, 312),
+                collision_margin=(40, 8, -3, 170)
+
+            ),
+
+            # -------------------------------------------------
+            # Mesas dos funcionários
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesas_funcionarios.png",
                 20, 380,
-                size=(380, 174)
+                size=(380, 174),
+                collision_margin=(5, 50, -3, 12)
             ),
 
             # -------------------------------------------------
-            # Mesa de centro (perto do sofá)
+            # Mesa de centro
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_centro.png",
-                775, 380,
-                size=(125, 100)
+                775, 390,
+                size=(140, 106),
+                collision_margin=(10, 15, 10, 8)
             ),
 
             # -------------------------------------------------
-            # Pilha de papéis (perto do sofá)
+            # Pilha de papéis
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/papeis.png",
-                695, 455,
-                size=(50, 112)
+                700, 455,
+                size=(50, 112),
+                collision_margin=(5, 15, 5, 10)
             ),
 
             # -------------------------------------------------
-            # Planta
+            # Plantas
             # -------------------------------------------------
 
             Furniture(
                 "assets/furniture/planta.png",
                 565, 452,
-                size=(50, 115)
+                size=(50, 115),
+                collision_margin=(-5, 30, 10, 15)
             ),
 
         ]
 
     def draw(self, window):
-
         for piece in self.furniture:
-
             piece.draw(window)

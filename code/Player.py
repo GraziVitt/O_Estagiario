@@ -12,7 +12,7 @@ class Player:
         # -------------------------
 
         self.x = 90
-        self.y = 220
+        self.y = 110
 
         self.old_x = self.x
         self.old_y = self.y
