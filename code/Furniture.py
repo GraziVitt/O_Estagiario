@@ -1,32 +1,24 @@
 import pygame
 
-
 class Furniture:
-
-    def __init__(self, image_path, x, y, collision):
-
+    def __init__(self, image_path, x, y, size=None):
+        """
+        Carrega uma imagem e a coloca na posição (x, y).
+        Se 'size' for fornecido (tupla (largura, altura)), redimensiona a imagem.
+        """
         self.image = pygame.image.load(image_path).convert_alpha()
-
-        self.x = x
-        self.y = y
-
+        if size:
+            self.image = pygame.transform.scale(self.image, size)
         self.rect = self.image.get_rect(topleft=(x, y))
 
-        # collision = (offset_x, offset_y, largura, altura)
-
-        self.collision = pygame.Rect(
-
-            x + collision[0],
-            y + collision[1],
-            collision[2],
-            collision[3]
-
-        )
-
     def draw(self, window):
+        """Desenha o móvel na tela."""
+        window.blit(self.image, self.rect)
 
-        window.blit(self.image, (self.x, self.y))
+    def get_rect(self):
+        """Retorna o retângulo do móvel (para colisão)."""
+        return self.rect
 
     def get_collision(self):
-
-        return self.collision
+        """Retorna o retângulo de colisão (pode ser o mesmo que o rect)."""
+        return self.rect

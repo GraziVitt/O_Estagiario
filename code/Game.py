@@ -7,6 +7,8 @@ from code.Boss import Boss
 from code.Item import Item
 from code.Request import Request
 from code.Collision import COLLIDERS
+from code.Map import Map
+from code.Scenery import Scenery
 
 
 
@@ -34,14 +36,9 @@ class Game:
 
         self.big_font = pygame.font.SysFont("Arial", 42)
 
-        self.background = pygame.image.load(
-            "assets/background/escritorio.png"
-        ).convert()
+        self.map = Map("assets/background/escritorio.png")
 
-        self.background = pygame.transform.scale(
-            self.background,
-            (WIN_WIDTH, WIN_HEIGHT)
-        )
+        self.scenery = Scenery()
 
         self.items = [
 
@@ -179,20 +176,21 @@ class Game:
 
     def draw(self):
 
-        self.window.blit(
+        # Camada 0: background vazio
+        self.map.draw(self.window)
 
-            self.background,
-
-            (0,0)
-
-        )
-
+        # Camada 1: itens espalhados pelo escritório
         for item in self.items:
 
             item.draw(self.window)
 
+        # Camada 2: móveis
+        self.scenery.draw(self.window)
+
+        # Camada 3: jogador
         self.player.draw(self.window)
 
+        # Camada 4: chefe
         self.boss.draw(
 
             self.window,
@@ -201,6 +199,7 @@ class Game:
 
         )
 
+        # Camada 5: HUD
         self.draw_hud()
 
         # ==========================================
