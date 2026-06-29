@@ -110,6 +110,26 @@ class Scenery:
                 collision_margin=(-5, 30, 10, 15)
             ),
 
+            # Funcionária sentada)
+            Furniture(
+                "assets/sprites/mulher.png",
+                15, 417,
+                size=(100, 150),
+                collision_margin=(5, 5, 5, 5),
+
+            ),
+
+            # Funcionário sentado)
+            Furniture(
+                "assets/sprites/homem.png",
+                215, 417,
+                size=(100, 150),
+                collision_margin=(5, 5, 5, 5),
+
+            ),
+
+
+
         ]
 
     def draw(self, window):
