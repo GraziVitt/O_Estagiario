@@ -14,7 +14,7 @@ class Scenery:
                 "assets/furniture/mesa_estagiario.png",
                 0, 140,
                 size=(260, 212),
-                collision_margin=(-80, 60, 60, 48)  # + esquerda, + topo, + direita, + baixo
+                collision_margin=(-80, 60, 60, 55)  # + esquerda, + topo, + direita, + baixo
             ),
 
             # -------------------------------------------------
@@ -34,7 +34,7 @@ class Scenery:
                 "assets/furniture/cafeteira.png",
                 300, 130,
                 size=(140, 176),
-                collision_margin=(8, 65, 8, 55)
+                collision_margin=(8, 65, 8, 35)
             ),
 
             # -------------------------------------------------
@@ -44,7 +44,7 @@ class Scenery:
                 "assets/furniture/impressora.png",
                 445, 135,
                 size=(85, 170),
-                collision_margin=(5, 65, 5, 52)
+                collision_margin=(5, 65, 5, 35)
             ),
 
             # -------------------------------------------------
@@ -52,8 +52,8 @@ class Scenery:
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_chefe.png",
-                730, 60,
-                size=(170, 312),
+                695, 60,
+                size=(160, 295),
                 collision_margin=(5, 140, -3, 50)
 
             ),
@@ -63,9 +63,10 @@ class Scenery:
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_chefe.png",
-                730, 60,
-                size=(170, 312),
-                collision_margin=(40, 8, -3, 170)
+                700, 60,
+                size=(160, 295),
+                collision_margin=(20, 8, -3, 170)
+
 
             ),
 
@@ -84,7 +85,7 @@ class Scenery:
             # -------------------------------------------------
             Furniture(
                 "assets/furniture/mesa_centro.png",
-                775, 390,
+                775, 380,
                 size=(140, 106),
                 collision_margin=(10, 15, 10, 8)
             ),
