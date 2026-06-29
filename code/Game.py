@@ -5,7 +5,7 @@ from code.Player import Player
 from code.Boss import Boss
 from code.Item import Item
 from code.Request import Request
-from code.Collision import COLLIDERS, WALLS, FURNITURE  # <-- IMPORTEI FURNITURE
+from code.Collision import COLLIDERS, WALLS
 from code.Scenery import Scenery
 
 
@@ -35,49 +35,12 @@ class Game:
         )
 
         self.items = [
-
-            Item(
-                "cafe",
-                "assets/itens/cafe.png",
-                (320, 200),
-                (28, 36)
-            ),
-
-            Item(
-                "caneta",
-                "assets/itens/caneta.png",
-                (359, 460),
-                (34, 15)
-            ),
-
-            Item(
-                "documentos",
-                "assets/itens/documentos.png",
-                (470, 205),
-                (38, 28)
-            ),
-
-            Item(
-                "copo",
-                "assets/itens/copo.png",
-                (587, 99),
-                (20, 30)
-            ),
-
-            Item(
-                "grampeador",
-                "assets/itens/grampeador.png",
-                (175, 235),
-                (30, 18)
-            ),
-
-            Item(
-                "pasta",
-                "assets/itens/pasta.png",
-                (120, 418),
-                (36, 42)
-            )
-
+            Item("cafe", "assets/itens/cafe.png", (340, 210)),
+            Item("caneta", "assets/itens/caneta.png", (45, 205)),
+            Item("documentos", "assets/itens/documentos.png", (470, 205)),
+            Item("copo", "assets/itens/copo.png", (595, 75)),
+            Item("grampeador", "assets/itens/grampeador.png", (65, 70)),
+            Item("pasta", "assets/itens/pasta.png", (130, 445))
         ]
 
         self.scenery = Scenery()
@@ -130,8 +93,12 @@ class Game:
         # 1. Fundo
         self.window.blit(self.background, (0, 0))
 
+        # 2. Itens
+        for item in self.items:
+            item.draw(self.window)
+
         # ==========================================
-        # 2. Móveis normais (sem always_front) + jogador
+        # 3. Móveis normais (sem always_front) + jogador
         # ==========================================
         objetos_para_desenhar = []
 
@@ -152,18 +119,9 @@ class Game:
 
         objetos_para_desenhar.sort(key=get_bottom)
 
-        # Desenha tudo (jogador + móveis normais), respeitando a profundidade
+        # Desenha tudo (jogador + móveis normais)
         for obj in objetos_para_desenhar:
             obj.draw(self.window)
-
-        # ==========================================
-        # 3. Itens — SEMPRE por cima dos móveis e do jogador
-        # ==========================================
-        # Os itens são objetos de coleta, não fazem parte da
-        # ordenação por profundidade: ficam sempre visíveis,
-        # mesmo quando estão em cima de um móvel.
-        for item in self.items:
-            item.draw(self.window)
 
         # ==========================================
         # 4. Chefe (desenha antes da mesa, se quiser que fique atrás)
@@ -176,11 +134,21 @@ class Game:
         for mob in self.scenery.furniture:
             if mob.always_front:
                 mob.draw(self.window)
+                # print("Desenhando móvel sempre_front: ", mob)  # pode remover depois
 
         # ==========================================
         # 6. HUD (sempre por cima de tudo)
         # ==========================================
         self.draw_hud()
+
+        # ==========================================
+        # 7. DEBUG (opcional)
+        # ==========================================
+        for wall in WALLS:
+            pygame.draw.rect(self.window, (255, 0, 0), wall, 2)
+
+        for mob in self.scenery.furniture:
+            pygame.draw.rect(self.window, (0, 255, 0), mob.get_collision(), 2)
 
         pygame.display.flip()
 
@@ -202,18 +170,9 @@ class Game:
                     player_rect = self.player.get_rect()
                     break
 
-            # Colisão com móveis do cenário (com sprites)
+            # Colisão com móveis
             for mob in self.scenery.furniture:
                 if player_rect.colliderect(mob.get_collision()):
-                    self.player.undo_move()
-                    player_rect = self.player.get_rect()
-                    break
-
-            # ==========================================
-            # Colisão com os móveis extras (FURNITURE)  <-- NOVO
-            # ==========================================
-            for furn in FURNITURE:
-                if player_rect.colliderect(furn):
                     self.player.undo_move()
                     player_rect = self.player.get_rect()
                     break
@@ -232,22 +191,18 @@ class Game:
                     quit()
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-
-                    # Rect maior, só para pegar/entregar item — não afeta
-                    # a colisão de movimento (paredes/móveis continuam
-                    # usando o player_rect "justo" de sempre)
-                    interaction_rect = self.player.get_interaction_rect()
+                    player_rect = self.player.get_rect()
 
                     if not self.player.carrying_item:
                         for item in self.items:
                             if item.collected:
                                 continue
-                            if interaction_rect.colliderect(item.get_rect()):
+                            if player_rect.colliderect(item.get_rect()):
                                 item.collected = True
                                 self.player.pick_item(item)
                                 break
                     else:
-                        if interaction_rect.colliderect(self.boss.get_rect()):
+                        if player_rect.colliderect(self.boss.get_rect()):
                             if self.request.check_delivery(self.player.current_item):
                                 self.boss.show_message("Boa!")
                             else:

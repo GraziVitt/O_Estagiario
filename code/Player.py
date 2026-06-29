@@ -23,15 +23,6 @@ class Player:
         self.height = 55
 
         # -------------------------
-        # Distância extra para pegar/entregar itens
-        # -------------------------
-        # Quanto maior esse número, mais "de longe" o jogador
-        # consegue pegar um item ou entregar pro chefe — útil
-        # quando o item está em cima de um móvel e a colisão
-        # do móvel não deixa o player_rect chegar bem perto.
-        self.pickup_range = 16
-
-        # -------------------------
         # Sistema de itens
         # -------------------------
 
@@ -221,32 +212,15 @@ class Player:
 
     def get_rect(self):
 
-        area = pygame.Rect(
+        return pygame.Rect(
+
             self.x,
+
             self.y,
+
             self.width,
+
             self.height
-        )
-
-        area.inflate_ip(14, 10)  # aumenta 30 pixels para cada lado
-
-        return area
-
-    # =======================================
-
-    def get_interaction_rect(self):
-        """
-        Rect maior que o de colisão, usado apenas para checar
-        se o jogador está perto o suficiente de um item ou do
-        chefe para pegar/entregar. Não interfere na colisão de
-        movimento (paredes e móveis continuam usando get_rect()).
-        """
-
-        return self.get_rect().inflate(
-
-            self.pickup_range,
-
-            self.pickup_range
 
         )
 
